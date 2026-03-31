@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MANAGER
+  EMPLOYEE
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+enum AssignmentStatus {
+  ASSIGNED
+  SWAPPING
+  OPEN
+}
+
+enum SwapStatus {
+  OPEN
+  CLAIMED
+  APPROVED
+  DENIED
+}
+
+enum ImpactLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         Role     @default(EMPLOYEE)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  managedRestaurants Restaurant[]
+  availabilities     Availability[]
+  timeOffRequests    TimeOffRequest[]    @relation("EmployeeTimeOff")
+  reviewedTimeOff    TimeOffRequest[]    @relation("ReviewerTimeOff")
+  shiftAssignments   ShiftAssignment[]
+  swapRequests       ShiftSwapRequest[]  @relation("SwapRequester")
+  claimedSwaps       ShiftSwapRequest[]  @relation("SwapClaimer")
+
+  @@index([role])
+  @@index([email])
+}
+
+model Restaurant {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  timezone  String   @default("America/Chicago")
+  managerId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  manager User    @relation(fields: [managerId], references: [id])
+  shifts  Shift[]
+  events  Event[]
+
+  @@index([managerId])
+}
+
+model Availability {
+  id             String    @id @default(cuid())
+  employeeId     String
+  dayOfWeek      DayOfWeek
+  startTime      String    // "HH:mm" format
+  endTime        String    // "HH:mm" format
+  isRecurring    Boolean   @default(true)
+  effectiveDate  DateTime?
+  expirationDate DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  employee User @relation(fields: [employeeId], references: [id])
+
+  @@index([employeeId])
+  @@index([dayOfWeek])
+}
+
+model TimeOffRequest {
+  id           String        @id @default(cuid())
+  employeeId   String
+  startDate    DateTime
+  endDate      DateTime
+  reason       String?
+  status       RequestStatus @default(PENDING)
+  reviewedById String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // Relations
+  employee   User  @relation("EmployeeTimeOff", fields: [employeeId], references: [id])
+  reviewedBy User? @relation("ReviewerTimeOff", fields: [reviewedById], references: [id])
+
+  @@index([employeeId])
+  @@index([status])
+}
+
+model Shift {
+  id            String   @id @default(cuid())
+  restaurantId  String
+  date          DateTime
+  startTime     String   // "HH:mm" format
+  endTime       String   // "HH:mm" format
+  role          String   // "server", "cook", "host", "busser"
+  requiredCount Int      @default(1)
+  isPublished   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  restaurant  Restaurant        @relation(fields: [restaurantId], references: [id])
+  assignments ShiftAssignment[]
+
+  @@index([restaurantId])
+  @@index([date])
+  @@index([role])
+}
+
+model ShiftAssignment {
+  id         String           @id @default(cuid())
+  shiftId    String
+  employeeId String
+  status     AssignmentStatus @default(ASSIGNED)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  // Relations
+  shift        Shift              @relation(fields: [shiftId], references: [id])
+  employee     User               @relation(fields: [employeeId], references: [id])
+  swapRequests ShiftSwapRequest[]
+
+  @@unique([shiftId, employeeId])
+  @@index([shiftId])
+  @@index([employeeId])
+  @@index([status])
+}
+
+model ShiftSwapRequest {
+  id                   String     @id @default(cuid())
+  originalAssignmentId String
+  requestedById        String
+  claimedById          String?
+  status               SwapStatus @default(OPEN)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+
+  // Relations
+  originalAssignment ShiftAssignment @relation(fields: [originalAssignmentId], references: [id])
+  requestedBy        User            @relation("SwapRequester", fields: [requestedById], references: [id])
+  claimedBy          User?           @relation("SwapClaimer", fields: [claimedById], references: [id])
+
+  @@index([originalAssignmentId])
+  @@index([status])
+}
+
+model Event {
+  id             String      @id @default(cuid())
+  restaurantId   String
+  name           String
+  date           DateTime
+  description    String?
+  expectedImpact ImpactLevel @default(MEDIUM)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@index([restaurantId])
+  @@index([date])
+}
