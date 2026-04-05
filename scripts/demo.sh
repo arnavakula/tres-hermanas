@@ -6,27 +6,28 @@ cd "$ROOT"
 
 DEMO_DB="prisma/demo.db"
 
-echo "Setting up demo mode..."
-
-# Generate SQLite-compatible schema from the PostgreSQL one
+# Always generate the SQLite schema (cheap, keeps it in sync)
 node scripts/generate-demo-schema.js
-
-# Remove stale demo DB so we start fresh
-rm -f "$DEMO_DB"
 
 # Point Prisma at the SQLite file
 export DATABASE_URL="file:./demo.db"
 
-# Create tables and generate client
-npx prisma db push --schema=prisma/schema.demo.prisma --skip-generate --accept-data-loss
-npx prisma generate --schema=prisma/schema.demo.prisma
-
-# Seed
-npx tsx prisma/seed.ts
+if [ -f "$DEMO_DB" ]; then
+  echo "Existing demo database found — preserving your data."
+  echo "  (Delete prisma/demo.db to start fresh)"
+  # Regenerate client in case schema changed
+  npx prisma generate --schema=prisma/schema.demo.prisma
+else
+  echo "Creating demo database..."
+  npx prisma db push --schema=prisma/schema.demo.prisma --skip-generate --accept-data-loss
+  npx prisma generate --schema=prisma/schema.demo.prisma
+  npx tsx prisma/seed.ts
+fi
 
 echo ""
 echo "Demo ready! Starting dev server..."
-echo "  Login: maria@treshermanas.com / password123"
+echo "  Manager: maria@treshermanas.com / password123"
+echo "  Employee: carlos@treshermanas.com / password123"
 echo ""
 
 exec npx next dev
