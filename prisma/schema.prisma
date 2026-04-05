@@ -65,6 +65,7 @@ model User {
   shiftAssignments   ShiftAssignment[]
   swapRequests       ShiftSwapRequest[]  @relation("SwapRequester")
   claimedSwaps       ShiftSwapRequest[]  @relation("SwapClaimer")
+  notifications      Notification[]
 
   @@index([role])
   @@index([email])
@@ -198,4 +199,19 @@ model Event {
 
   @@index([restaurantId])
   @@index([date])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  type      String   // "swap_posted", "swap_claimed", "swap_approved", "swap_denied"
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([read])
 }

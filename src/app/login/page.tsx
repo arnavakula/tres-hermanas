@@ -44,6 +44,7 @@ export default function LoginPage() {
       const sessionRes = await fetch("/api/auth/session");
       const session = await sessionRes.json();
 
+      router.refresh();
       if (session?.user?.role === "MANAGER") {
         router.push("/dashboard");
       } else {

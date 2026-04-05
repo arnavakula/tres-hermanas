@@ -1,0 +1,28 @@
+{
+  "name": "Tres Hermanas",
+  "short_name": "TH",
+  "description": "Restaurant scheduling and operations hub",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8f6",
+  "theme_color": "#b5502b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/icon-192-maskable.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

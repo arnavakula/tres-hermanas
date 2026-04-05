@@ -1,5 +1,13 @@
-import { PrismaClient, Role, DayOfWeek, ImpactLevel } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+
+// Enum-like objects that work for both PostgreSQL (real enums) and SQLite (strings)
+const Role = { MANAGER: "MANAGER", EMPLOYEE: "EMPLOYEE" } as const;
+const DayOfWeek = {
+  MONDAY: "MONDAY", TUESDAY: "TUESDAY", WEDNESDAY: "WEDNESDAY",
+  THURSDAY: "THURSDAY", FRIDAY: "FRIDAY", SATURDAY: "SATURDAY", SUNDAY: "SUNDAY",
+} as const;
+const ImpactLevel = { LOW: "LOW", MEDIUM: "MEDIUM", HIGH: "HIGH" } as const;
 
 const prisma = new PrismaClient();
 
@@ -7,6 +15,7 @@ async function main() {
   console.log("Seeding database...");
 
   // Clear existing data
+  await prisma.notification.deleteMany();
   await prisma.shiftSwapRequest.deleteMany();
   await prisma.shiftAssignment.deleteMany();
   await prisma.shift.deleteMany();

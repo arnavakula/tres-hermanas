@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Save, Loader2, Check } from "lucide-react";
+import { toast } from "sonner";
 
 const DAYS = [
   "MONDAY",
@@ -166,9 +167,12 @@ export default function AvailabilityPage() {
         setSavedGrid({ ...grid });
         setShowSaved(true);
         setTimeout(() => setShowSaved(false), 2000);
+        toast.success("Availability saved!");
+      } else {
+        toast.error("Failed to save availability");
       }
     } catch {
-      console.error("Failed to save availability");
+      toast.error("Failed to save availability");
     } finally {
       setIsSaving(false);
     }

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Calendar, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface TimeOffRequest {
   id: string;
@@ -89,9 +90,11 @@ export default function EmployeeTimeOffPage() {
 
       setShowForm(false);
       setFormData({ startDate: "", endDate: "", reason: "" });
+      toast.success("Time-off request submitted!");
       fetchRequests();
     } catch {
       setError("Failed to submit request");
+      toast.error("Failed to submit request");
     } finally {
       setIsSubmitting(false);
     }
