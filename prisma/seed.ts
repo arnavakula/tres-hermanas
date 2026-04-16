@@ -1,13 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role, DayOfWeek, ImpactLevel, AssignmentStatus, SwapStatus, RequestStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
-
-// Enum-like objects that work for both PostgreSQL (real enums) and SQLite (strings)
-const Role = { MANAGER: "MANAGER", EMPLOYEE: "EMPLOYEE" } as const;
-const DayOfWeek = {
-  MONDAY: "MONDAY", TUESDAY: "TUESDAY", WEDNESDAY: "WEDNESDAY",
-  THURSDAY: "THURSDAY", FRIDAY: "FRIDAY", SATURDAY: "SATURDAY", SUNDAY: "SUNDAY",
-} as const;
-const ImpactLevel = { LOW: "LOW", MEDIUM: "MEDIUM", HIGH: "HIGH" } as const;
 
 const prisma = new PrismaClient();
 
@@ -83,7 +75,7 @@ async function main() {
   });
 
   // ── Availability ───────────────────────────────────────────────────────
-  const avail = (empId: string, day: (typeof DayOfWeek)[keyof typeof DayOfWeek], start: string, end: string) => ({
+  const avail = (empId: string, day: DayOfWeek, start: string, end: string) => ({
     employeeId: empId, dayOfWeek: day, startTime: start, endTime: end, isRecurring: true,
   });
 
@@ -185,7 +177,7 @@ async function main() {
   // Template indices: 0=AM server, 1=PM server, 2=AM cook, 3=PM cook, 4=lunch host, 5=evening host
 
   // Build assignment helper
-  const assign = async (shiftKey: string, employeeId: string, status = "ASSIGNED") => {
+  const assign = async (shiftKey: string, employeeId: string, status: AssignmentStatus = AssignmentStatus.ASSIGNED) => {
     const shift = allShifts[shiftKey];
     return prisma.shiftAssignment.create({
       data: { shiftId: shift.id, employeeId, status },
@@ -289,13 +281,13 @@ async function main() {
   if (sofiaFriPmAssignment) {
     await prisma.shiftAssignment.update({
       where: { id: sofiaFriPmAssignment.id },
-      data: { status: "SWAPPING" },
+      data: { status: AssignmentStatus.SWAPPING },
     });
     await prisma.shiftSwapRequest.create({
       data: {
         originalAssignmentId: sofiaFriPmAssignment.id,
         requestedById: sofia.id,
-        status: "OPEN",
+        status: SwapStatus.OPEN,
       },
     });
   }
@@ -307,14 +299,14 @@ async function main() {
   if (anaThurPmAssignment) {
     await prisma.shiftAssignment.update({
       where: { id: anaThurPmAssignment.id },
-      data: { status: "SWAPPING" },
+      data: { status: AssignmentStatus.SWAPPING },
     });
     await prisma.shiftSwapRequest.create({
       data: {
         originalAssignmentId: anaThurPmAssignment.id,
         requestedById: ana.id,
         claimedById: isabella.id,
-        status: "CLAIMED",
+        status: SwapStatus.CLAIMED,
       },
     });
   }
@@ -331,7 +323,7 @@ async function main() {
       startDate: nextWed,
       endDate: nextThu,
       reason: "Family wedding in San Antonio",
-      status: "PENDING",
+      status: RequestStatus.PENDING,
     },
   });
 
@@ -342,7 +334,7 @@ async function main() {
       startDate: nextFriDate,
       endDate: nextFriDate,
       reason: "Dentist appointment",
-      status: "PENDING",
+      status: RequestStatus.PENDING,
     },
   });
 
@@ -354,7 +346,7 @@ async function main() {
       startDate: lastMonday,
       endDate: lastMonday,
       reason: "Car maintenance",
-      status: "APPROVED",
+      status: RequestStatus.APPROVED,
       reviewedById: manager.id,
     },
   });
