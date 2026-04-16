@@ -83,7 +83,7 @@ async function main() {
   });
 
   // ── Availability ───────────────────────────────────────────────────────
-  const avail = (empId: string, day: string, start: string, end: string) => ({
+  const avail = (empId: string, day: (typeof DayOfWeek)[keyof typeof DayOfWeek], start: string, end: string) => ({
     employeeId: empId, dayOfWeek: day, startTime: start, endTime: end, isRecurring: true,
   });
 

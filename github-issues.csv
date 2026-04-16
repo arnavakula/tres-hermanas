@@ -1,0 +1,77 @@
+title,body,labels
+"Manager-to-employee messaging","## Summary
+Add the ability for managers to send messages directly to individual employees within the app.
+
+## Motivation
+Managers need a way to communicate with employees about schedule changes, shift reminders, and other work-related topics without relying on personal phone numbers or external apps.
+
+## Requirements
+- Manager can send a message to any employee from the dashboard
+- Employees receive messages in an inbox or notification panel
+- Message history is preserved for both parties",enhancement
+"Employee group chat","## Summary
+Add a built-in group chat so employees can communicate with each other.
+
+## Motivation
+Employees often need to coordinate informally — asking for rides home, requesting shift trades, or general team communication. A built-in chat removes the need for a separate group text or app.
+
+## Requirements
+- Shared team chat visible to all employees at the restaurant
+- Optional: direct messages between individual employees
+- Messages should be lightweight and real-time
+
+## Notes
+Nice-to-have feature. Lower priority than manager messaging.",enhancement,nice-to-have
+"Student profile: class schedule and graduation date","## Summary
+Prompt new users to indicate whether they are a student during account creation. If yes, collect their expected graduation date, class schedule, and finals schedule.
+
+## Motivation
+Many employees are students. Knowing their class and finals schedules helps managers avoid scheduling conflicts and plan ahead for graduation turnover.
+
+## Requirements
+- During registration, ask if the user is a student
+- If yes, collect: expected graduation date, weekly class times, and finals dates
+- Store this info on the employee profile so it can be updated anytime
+- Send a quarterly reminder (e.g. start of each quarter) prompting students to update their class schedule",enhancement
+"Calendar-style schedule view","## Summary
+Rework the employee and manager schedule views to look more like a traditional calendar rather than the current grid layout.
+
+## Motivation
+A calendar layout is more intuitive and familiar — easier to scan at a glance and understand the week/month ahead.
+
+## Requirements
+- Monthly and weekly calendar views
+- Shifts displayed as blocks on the calendar
+- Click into a day to see shift details",enhancement,ui
+"Auto-discover local events and weather for scheduling","## Summary
+Replace the manual event entry with an automated system that discovers upcoming events in Davis and displays local weather — helping managers anticipate busy periods they might not already know about.
+
+## Motivation
+The current event feature only lets managers log events they already know about. The real value is surfacing things they *don't* know — a downtown festival, a baseball game, graduation weekend — so they can staff accordingly.
+
+## Requirements
+- Web scraper or API integration that pulls upcoming events in Davis (e.g. downtown events, UC Davis sports, community calendars)
+- Weather forecast integration (daily high/low, conditions)
+- Display events and weather on a calendar view on the manager dashboard
+- Manager can flag an event as high/medium/low impact for staffing",enhancement
+"Custom shift times and closing shifts","## Summary
+Replace the fixed morning/afternoon/night shift slots with fully custom start and end times. Add support for a ""closing"" shift type where the end time varies by night.
+
+## Motivation
+Restaurant shifts don't fit neatly into three buckets. Managers need to define exact hours (e.g. 10:30 AM – 3:00 PM), and closing time changes depending on the night and when the last customers leave.
+
+## Requirements
+- Manager can set arbitrary start and end times when creating a shift
+- Add a ""closing"" shift option where the end time is flexible or set after the fact
+- Shift display should reflect the actual times, not fixed labels",enhancement
+"Payroll tracking: hours worked and hourly rates","## Summary
+Add basic payroll visibility so managers can see how many hours each employee has worked and what they earn per hour.
+
+## Motivation
+Managers need to track labor costs and ensure employees are getting the right number of hours. Currently there is no way to see this information in the app.
+
+## Requirements
+- Store hourly pay rate on each employee's profile
+- Calculate total hours worked per week/pay period from shift assignments
+- Manager dashboard view showing hours and estimated pay per employee
+- Optional: flag overtime (hours exceeding a threshold)",enhancement
